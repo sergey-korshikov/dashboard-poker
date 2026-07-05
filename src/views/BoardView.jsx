@@ -28,14 +28,29 @@ export function BoardView() {
     return seconds;
   }, [timeLeft, currentLevelIndex, settings.levels]);
 
+  // ИСПРАВЛЕНО: Рассчитываем активность аддонов в заданном диапазоне уровней
   const isAddonLevelActive = useMemo(() => {
-    if (!currentLevel || currentLevel.isBreak) return false;
-    return displayLevelNumber === settings.addonLevel && settings.addonCost > 0;
-  }, [currentLevel, displayLevelNumber, settings.addonLevel, settings.addonCost]);
+    if (settings.addonCost <= 0) return false;
+
+    // Определяем номер текущего или СЛЕДУЮЩЕГО за перерывом игрового раунда
+    let targetGameLevel = displayLevelNumber;
+
+    if (currentLevel?.isBreak) {
+      let nextGameLevelNumber = 0;
+      for (let i = 0; i <= currentLevelIndex; i++) {
+        if (!settings.levels[i].isBreak) nextGameLevelNumber++;
+      }
+      targetGameLevel = nextGameLevelNumber + 1;
+    }
+
+    // Проверяем, входит ли раунд в разрешенный промежуток (например, от 3 до 6 включительно)
+    const start = settings.addonStartLevel || 3;
+    const end = settings.addonEndLevel || 6;
+
+    return targetGameLevel >= start && targetGameLevel <= end;
+  }, [currentLevel, currentLevelIndex, displayLevelNumber, settings.addonStartLevel, settings.addonEndLevel, settings.addonCost, settings.levels]);
 
   return (
-    /* ИСПРАВЛЕНО: Убран класс absolute inset-0. Теперь блок занимает ровно flex-1 
-       от доступной высоты main-контейнера и больше никогда не перекрывается шапкой! */
     <div className='w-full h-full flex flex-col gap-4 font-sans select-none overflow-y-auto lg:overflow-hidden bg-slate-950'>
       {/* ЦЕНТРАЛЬНЫЙ РЯД СТРУКТУРЫ */}
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 items-stretch'>

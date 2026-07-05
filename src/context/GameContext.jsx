@@ -7,34 +7,35 @@ import levelUpSound from '../assets/round.mp3';
 const GameContext = createContext();
 
 const defaultSettings = {
-  title: 'Домашний турнир по покер',
+  title: 'Домашний турнир по покеру',
   buyInCost: 400,
   buyInStack: 20000,
   rebuyBaseStep: 200,
   rebuyTriggerBB: 3000,
-  addonCost: 0,
-  addonStack: 0,
-  addonLevel: 8, // На каком ИГРОВОМ уровне (не перерыве) доступен аддон
+  addonCost: 400,
+  addonStack: 20000,
+  addonStartLevel: 4,
+  addonEndLevel: 6,
   levels: [
-    { id: 1, sb: 100, bb: 200, ante: 0, duration: 1200, isBreak: false }, // 1200 сек = 20 минут
+    { id: 1, sb: 100, bb: 100, ante: 0, duration: 1200, isBreak: false },
     { id: 2, sb: 100, bb: 200, ante: 0, duration: 1200, isBreak: false },
     { id: 3, sb: 200, bb: 400, ante: 0, duration: 1200, isBreak: false },
-    { id: 4, duration: 900, isBreak: true, name: 'Перерыв' }, // 900 сек = 15 минут
+    { id: 4, duration: 900, isBreak: true, name: 'Перерыв' },
     { id: 5, sb: 300, bb: 600, ante: 0, duration: 1200, isBreak: false },
-    { id: 6, sb: 500, bb: 1000, ante: 0, duration: 1200, isBreak: false },
-    { id: 7, sb: 700, bb: 1400, ante: 0, duration: 1200, isBreak: false },
+    { id: 6, sb: 400, bb: 800, ante: 0, duration: 1200, isBreak: false },
+    { id: 7, sb: 500, bb: 1000, ante: 0, duration: 1200, isBreak: false },
     { id: 8, duration: 900, isBreak: true, name: 'Перерыв' },
-    { id: 9, sb: 1000, bb: 2000, ante: 0, duration: 1200, isBreak: false },
-    { id: 10, sb: 1500, bb: 3000, ante: 0, duration: 1200, isBreak: false },
-    { id: 11, sb: 2000, bb: 4000, ante: 0, duration: 1200, isBreak: false },
+    { id: 9, sb: 700, bb: 1400, ante: 0, duration: 1200, isBreak: false },
+    { id: 10, sb: 1000, bb: 2000, ante: 0, duration: 1200, isBreak: false },
+    { id: 11, sb: 1500, bb: 3000, ante: 0, duration: 1200, isBreak: false },
     { id: 12, duration: 900, isBreak: true, name: 'Перерыв' },
-    { id: 13, sb: 3000, bb: 6000, ante: 0, duration: 1200, isBreak: false },
-    { id: 14, sb: 4000, bb: 8000, ante: 0, duration: 1200, isBreak: false },
-    { id: 15, sb: 5000, bb: 10000, ante: 0, duration: 1200, isBreak: false },
+    { id: 13, sb: 2000, bb: 4000, ante: 0, duration: 1200, isBreak: false },
+    { id: 14, sb: 3000, bb: 6000, ante: 0, duration: 1200, isBreak: false },
+    { id: 15, sb: 4000, bb: 8000, ante: 0, duration: 1200, isBreak: false },
     { id: 16, duration: 900, isBreak: true, name: 'Перерыв' },
-    { id: 17, sb: 10000, bb: 20000, ante: 0, duration: 1200, isBreak: false },
-    { id: 18, sb: 20000, bb: 40000, ante: 0, duration: 1200, isBreak: false },
-    { id: 19, sb: 30000, bb: 60000, ante: 0, duration: 1200, isBreak: false },
+    { id: 17, sb: 5000, bb: 10000, ante: 0, duration: 1200, isBreak: false },
+    { id: 18, sb: 10000, bb: 20000, ante: 0, duration: 1200, isBreak: false },
+    { id: 19, sb: 20000, bb: 40000, ante: 0, duration: 1200, isBreak: false },
   ],
 };
 

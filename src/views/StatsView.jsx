@@ -4,7 +4,27 @@ import { useGame } from '../context/GameContext';
 export function StatsView() {
   const { players, events, showCurrency, currentLevelIndex, settings, displayLevelNumber, playerRebuy, playerOut, playerAddon, calculateNextRebuy, undoLastEvent } = useGame();
 
-  const isAddonLevelActive = displayLevelNumber === settings.addonLevel;
+  // ИСПРАВЛЕНО: Рассчитываем активность аддонов в заданном диапазоне уровней для дилера
+  const currentLevel = settings.levels[currentLevelIndex];
+  const isAddonLevelActive = React.useMemo(() => {
+    if (settings.addonCost <= 0) return false;
+
+    // Определяем номер текущего или следующего за перерывом игрового раунда
+    let targetGameLevel = displayLevelNumber;
+
+    if (currentLevel?.isBreak) {
+      let nextGameLevelNumber = 0;
+      for (let i = 0; i <= currentLevelIndex; i++) {
+        if (!settings.levels[i].isBreak) nextGameLevelNumber++;
+      }
+      targetGameLevel = nextGameLevelNumber + 1;
+    }
+
+    const start = settings.addonStartLevel || 3;
+    const end = settings.addonEndLevel || 6;
+
+    return targetGameLevel >= start && targetGameLevel <= end;
+  }, [currentLevel, currentLevelIndex, displayLevelNumber, settings.addonStartLevel, settings.addonEndLevel, settings.addonCost, settings.levels]);
 
   const getPlayerStats = playerName => {
     const playerEvents = events.filter(e => e.playerName === playerName);
@@ -92,9 +112,11 @@ export function StatsView() {
                       {p.isOut ? 'Повторный вход' : `Ребай (${showCurrency ? `${nextRebuy.cost}₽` : '+стек'})`}
                     </button>
 
+                    {/* Кнопка аддона */}
                     {settings.addonCost > 0 && (
-                      <button onClick={() => playerAddon(name)} disabled={p.hasAddon || !isAddonLevelActive} className={`w-full text-xs h-9 rounded-lg font-medium transition ${p.hasAddon ? 'bg-slate-950 text-slate-700 border border-slate-900 cursor-not-allowed' : isAddonLevelActive ? 'bg-slate-850 hover:bg-slate-800 text-slate-100 border border-slate-700 cursor-pointer' : 'bg-slate-850 text-slate-600 border border-slate-800/40 cursor-not-allowed'}`}>
-                        {p.hasAddon ? 'Есть аддон' : `Аддон (${settings.addonCost}₽)`}
+                      <button onClick={() => playerAddon(name)} disabled={p.isOut || p.hasAddon || !isAddonLevelActive} className={`w-full text-xs h-9 rounded-lg font-medium transition ${p.isOut ? 'bg-slate-950 text-slate-700 border border-slate-900 cursor-not-allowed' : p.hasAddon ? 'bg-slate-950 text-slate-700 border border-slate-900 cursor-not-allowed' : isAddonLevelActive ? 'bg-slate-850 hover:bg-slate-800 text-slate-100 border border-slate-700 cursor-pointer' : 'bg-slate-850 text-slate-600 border border-slate-800/40 cursor-not-allowed'}`}>
+                        {/* ИСПРАВЛЕНО: Текст кнопки динамически скрывает рубли, если showCurrency равен false */}
+                        {p.isOut ? 'Выбыл' : p.hasAddon ? 'Есть аддон' : isAddonLevelActive ? (showCurrency ? `Аддон (${settings.addonCost}₽)` : 'Аддон (+стек)') : 'Аддон'}
                       </button>
                     )}
                   </div>

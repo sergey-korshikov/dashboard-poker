@@ -90,7 +90,7 @@ export function SetupView() {
     <div className='w-full max-w-5xl mx-auto space-y-6 p-4'>
       {/* СЕТКА НАСТРОЕК ЭКОНОМИКИ И ИГРОКОВ */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        {/* Финансовые настройки (ИСПРАВЛЕНО: grid-cols-1 sm:grid-cols-2 для адаптивного переноса строк) */}
+        {/* Финансовые настройки */}
         <div className='bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 shadow-xl'>
           <h3 className='text-lg font-bold text-white uppercase tracking-wider'>Финансы и Стек</h3>
 
@@ -116,18 +116,23 @@ export function SetupView() {
             </div>
           </div>
 
-          <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-slate-800/60 pt-4'>
+          {/* ИСПРАВЛЕНО: Сетка аддонов переведена на просторный формат по 2 поля в ряд */}
+          <div className='grid grid-cols-2 gap-4 border-t border-slate-800/60 pt-4'>
             <div>
-              <label className='text-xxs text-slate-400 block mb-1'>Цена аддона, ₽</label>
-              <input type='number' min={0} value={settings.addonCost} onChange={e => handleSettingChange('addonCost', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 h-9 text-sm font-mono text-white focus:outline-none' />
+              <label className='text-xs text-slate-400 block mb-1'>Цена аддона, ₽</label>
+              <input type='number' min={0} value={settings.addonCost} onChange={e => handleSettingChange('addonCost', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 h-9 text-sm font-mono text-white focus:outline-none' />
             </div>
             <div>
-              <label className='text-xxs text-slate-400 block mb-1'>Стек аддона</label>
-              <input type='number' min={0} value={settings.addonStack} onChange={e => handleSettingChange('addonStack', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 h-9 text-sm font-mono text-white focus:outline-none' />
+              <label className='text-xs text-slate-400 block mb-1'>Стек аддона</label>
+              <input type='number' min={0} value={settings.addonStack} onChange={e => handleSettingChange('addonStack', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 h-9 text-sm font-mono text-white focus:outline-none' />
             </div>
             <div>
-              <label className='text-xxs text-slate-400 block mb-1'>На каком уровне</label>
-              <input type='number' min={0} value={settings.addonLevel || 4} onChange={e => handleSettingChange('addonLevel', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-2 h-9 text-sm font-mono text-white focus:outline-none' />
+              <label className='text-xs text-slate-400 block mb-1'>С раунда</label>
+              <input type='number' min={0} value={settings.addonStartLevel || 3} onChange={e => handleSettingChange('addonStartLevel', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 h-9 text-sm font-mono text-white focus:outline-none' />
+            </div>
+            <div>
+              <label className='text-xs text-slate-400 block mb-1'>По раунд</label>
+              <input type='number' min={0} value={settings.addonEndLevel || 6} onChange={e => handleSettingChange('addonEndLevel', e.target.value)} className='w-full bg-slate-950 border border-slate-800 rounded-xl px-3 h-9 text-sm font-mono text-white focus:outline-none' />
             </div>
           </div>
         </div>
@@ -146,7 +151,7 @@ export function SetupView() {
 
             <div className='space-y-2'>
               <label className='text-xs text-slate-400 block'>Импорт участников списком (каждое имя с новой строки):</label>
-              {/* ИСПРАВЛЕНО: rows="5" увеличивает высоту текстового поля до пяти строк */}
+              {/* ИСПРАВЛЕНО: rows="5" увеличивает поле до пяти строк */}
               <textarea
                 rows='5'
                 value={bulkPlayersText}
@@ -182,7 +187,7 @@ export function SetupView() {
           </div>
         </div>
 
-        {/* ИСПРАВЛЕНО 1: АЛЬТЕРНАТИВНЫЙ ВИД КАРТОЧКАМИ ДЛЯ СМАРТФОНОВ (скрывается от md:) */}
+        {/* АЛЬТЕРНАТИВНЫЙ ВИД КАРТОЧКАМИ ДЛЯ СМАРТФОНОВ (скрывается от md:) */}
         <div className='block md:hidden space-y-3'>
           {settings.levels.map((level, index) => {
             const duration = level.duration || 0;
@@ -224,7 +229,7 @@ export function SetupView() {
                   <label className='text-[10px] text-slate-500 block mb-1 uppercase font-medium'>Длительность раунда (мин : сек)</label>
                   <div className='flex items-center gap-1.5'>
                     <input type='number' min={0} value={minutes} onChange={e => handleTimeChange(index, 'min', e.target.value)} placeholder='15' className='w-14 bg-slate-900 border border-slate-800 rounded-lg px-2 h-8 text-xs font-mono text-center text-white focus:outline-none' />
-                    <span className='text-slate-600 font-normal font-mono'>:</span>
+                    <span className='text-slate-600 font-bold font-mono'>:</span>
                     <input type='number' min={0} value={seconds} onChange={e => handleTimeChange(index, 'sec', e.target.value)} placeholder='00' className='w-12 bg-slate-900 border border-slate-800 rounded-lg px-1.5 h-8 text-xs font-mono text-center text-white focus:outline-none' />
                   </div>
                 </div>
@@ -233,7 +238,7 @@ export function SetupView() {
           })}
         </div>
 
-        {/* ИСПРАВЛЕНО 2: КЛАССИЧЕСКАЯ МОНОЛИТНАЯ ТАБЛИЦА ДЛЯ БОЛЬШИХ МОНИТОРОВ (видна только от md:) */}
+        {/* КЛАССИЧЕСКАЯ МОНОЛИТНАЯ ТАБЛИЦА ДЛЯ БОЛЬШИХ МОНИТОРОВ (видна только от md:) */}
         <div className='hidden md:block overflow-x-auto'>
           <table className='w-full text-left text-sm text-slate-300'>
             <thead>
@@ -244,7 +249,7 @@ export function SetupView() {
                 <th className='py-3 px-2 w-28 font-mono font-bold'>ББ</th>
                 <th className='py-3 px-2 w-24 font-mono font-bold'>Анте</th>
                 <th className='py-3 px-2 w-48 font-mono font-bold'>Время (мин : сек)</th>
-                <th className='py-3 px-2 w-24 text-center'>Действие</th>
+                <th className='py-3 px-2 w-24 text-center font-bold'>Действие</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-slate-800/40'>
