@@ -66,10 +66,10 @@ export function BoardView() {
           <div className='font-mono text-6xl sm:text-8xl lg:text-9xl xl:text-[11.5rem] font-bold text-white tracking-wide leading-none my-auto'>{formatTime(timeLeft)}</div>
 
           <div className='flex gap-2 mb-3'>
-            <button onClick={() => addTimeToCurrentRound(60)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition cursor-pointer'>
+            <button onClick={() => addTimeToCurrentRound(1)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition cursor-pointer'>
               +1 мин
             </button>
-            <button onClick={() => addTimeToCurrentRound(300)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition cursor-pointer'>
+            <button onClick={() => addTimeToCurrentRound(5)} className='bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-white px-3 py-1 rounded text-xxs font-mono font-bold uppercase transition cursor-pointer'>
               +5 мин
             </button>
           </div>
