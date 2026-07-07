@@ -7,7 +7,7 @@ import levelUpSound from '../assets/round.mp3';
 const GameContext = createContext();
 
 const defaultSettings = {
-  title: 'Домашний турнир по покеру',
+  title: 'Турнир по покеру',
   buyInCost: 400,
   buyInStack: 20000,
   rebuyBaseStep: 200,
@@ -31,38 +31,42 @@ const defaultSettings = {
     { id: 12, duration: 900, isBreak: true, name: 'Перерыв' },
     { id: 13, sb: 2000, bb: 4000, ante: 0, duration: 1200, isBreak: false },
     { id: 14, sb: 3000, bb: 6000, ante: 0, duration: 1200, isBreak: false },
-    { id: 15, sb: 4000, bb: 8000, ante: 0, duration: 1200, isBreak: false },
+    { id: 15, sb: 5000, bb: 10000, ante: 0, duration: 1200, isBreak: false },
     { id: 16, duration: 900, isBreak: true, name: 'Перерыв' },
-    { id: 17, sb: 5000, bb: 10000, ante: 0, duration: 1200, isBreak: false },
-    { id: 18, sb: 10000, bb: 20000, ante: 0, duration: 1200, isBreak: false },
+    { id: 17, sb: 10000, bb: 20000, ante: 0, duration: 1200, isBreak: false },
+    { id: 18, sb: 15000, bb: 30000, ante: 0, duration: 1200, isBreak: false },
     { id: 19, sb: 20000, bb: 40000, ante: 0, duration: 1200, isBreak: false },
+    { id: 20, duration: 900, isBreak: true, name: 'Перерыв' },
+    { id: 21, sb: 30000, bb: 60000, ante: 0, duration: 1200, isBreak: false },
+    { id: 22, sb: 40000, bb: 80000, ante: 0, duration: 1200, isBreak: false },
+    { id: 23, sb: 50000, bb: 100000, ante: 0, duration: 1200, isBreak: false },
   ],
 };
 
 export const GameProvider = ({ children }) => {
   const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem('poker_settings');
+    const saved = localStorage.getItem('poker_tournament_settings');
     return saved ? JSON.parse(saved) : defaultSettings;
   });
 
   const [events, setEvents] = useState(() => {
-    const saved = localStorage.getItem('poker_events');
+    const saved = localStorage.getItem('poker_tournament_events');
     return saved ? JSON.parse(saved) : [];
   });
 
   const [players, setPlayers] = useState(() => {
-    const saved = localStorage.getItem('poker_players');
+    const saved = localStorage.getItem('poker_tournament_players');
     return saved ? JSON.parse(saved) : [];
   });
 
   const [currentLevelIndex, setCurrentLevelIndex] = useState(() => {
-    return Number(localStorage.getItem('poker_current_level') || 0);
+    return Number(localStorage.getItem('poker_tournament_current_level') || 0);
   });
 
   const [showCurrency, setShowCurrency] = useState(true);
 
   const [timerState, setTimerState] = useState(() => {
-    const saved = localStorage.getItem('poker_timer_state');
+    const saved = localStorage.getItem('poker_tournament_timer_state');
     return saved ? JSON.parse(saved) : { startedAt: null, pausedAt: null, accumulatedPauseTime: 0 };
   });
 
@@ -70,19 +74,19 @@ export const GameProvider = ({ children }) => {
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem('poker_settings', JSON.stringify(settings));
+    localStorage.setItem('poker_tournament_settings', JSON.stringify(settings));
   }, [settings]);
   useEffect(() => {
-    localStorage.setItem('poker_events', JSON.stringify(events));
+    localStorage.setItem('poker_tournament_events', JSON.stringify(events));
   }, [events]);
   useEffect(() => {
-    localStorage.setItem('poker_players', JSON.stringify(players));
+    localStorage.setItem('poker_tournament_players', JSON.stringify(players));
   }, [players]);
   useEffect(() => {
-    localStorage.setItem('poker_current_level', currentLevelIndex);
+    localStorage.setItem('poker_tournament_current_level', currentLevelIndex);
   }, [currentLevelIndex]);
   useEffect(() => {
-    localStorage.setItem('poker_timer_state', JSON.stringify(timerState));
+    localStorage.setItem('poker_tournament_timer_state', JSON.stringify(timerState));
   }, [timerState]);
 
   const calculateTimeLeft = () => {
@@ -238,11 +242,9 @@ export const GameProvider = ({ children }) => {
   };
 
   // ПОКЕРНАЯ ЭКОНОМИКА С ПОДДЕРЖКОЙ RE-ENTRY
-  const calculateNextRebuy = (playerName) => {
+  const calculateNextRebuy = playerName => {
     // 1. Извлекаем все ребаи игрока в хронологическом порядке
-    const playerRebuyEvents = events.filter(
-      e => e.type === 'REBUY' && e.playerName === playerName
-    );
+    const playerRebuyEvents = events.filter(e => e.type === 'REBUY' && e.playerName === playerName);
 
     const currentLevel = settings.levels[currentLevelIndex];
     const isHeavyBlindsNow = currentLevel && currentLevel.bb >= settings.rebuyTriggerBB;
@@ -251,7 +253,7 @@ export const GameProvider = ({ children }) => {
     let currentCost = settings.buyInCost;
 
     // 3. Симулируем историю строго по блайндам турнира
-    playerRebuyEvents.forEach((event) => {
+    playerRebuyEvents.forEach(event => {
       // ИСПРАВЛЕНО: Теперь мы железно проверяем, на каком уровне блайндов был сделан этот прошлый ребай.
       // Если на момент того ребая Большой Блайнд (bb) уже был тяжелым (например, >= 1600),
       // то только тогда цена после него увеличивается умножением на 2.
@@ -282,12 +284,11 @@ export const GameProvider = ({ children }) => {
       }
     }
 
-    return { 
-      cost: currentCost, 
-      stack: settings.buyInStack 
+    return {
+      cost: currentCost,
+      stack: settings.buyInStack,
     };
   };
-
 
   const addPlayer = nameOrArray => {
     const newNames = Array.isArray(nameOrArray) ? nameOrArray : [nameOrArray];
@@ -306,19 +307,22 @@ export const GameProvider = ({ children }) => {
     setEvents(prev => [...prev, ...newEvents]);
   };
 
-  const playerRebuy = (playerName) => {
+  const playerRebuy = playerName => {
     const nextRebuy = calculateNextRebuy(playerName);
     const currentLevel = settings.levels[currentLevelIndex];
 
-    setEvents(prev => [...prev, {
-      id: crypto.randomUUID(),
-      type: 'REBUY',
-      playerName,
-      cost: nextRebuy.cost,
-      stack: nextRebuy.stack,
-      levelId: currentLevel?.id, // <-- ЖЕЛЕЗНО ПИШЕМ ID УРОВНЯ
-      timestamp: Date.now()
-    }]);
+    setEvents(prev => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        type: 'REBUY',
+        playerName,
+        cost: nextRebuy.cost,
+        stack: nextRebuy.stack,
+        levelId: currentLevel?.id, // <-- ЖЕЛЕЗНО ПИШЕМ ID УРОВНЯ
+        timestamp: Date.now(),
+      },
+    ]);
   };
 
   const playerOut = playerName => {
@@ -403,12 +407,32 @@ export const GameProvider = ({ children }) => {
   }, [events, players]);
 
   return (
-    <GameContext.Provider value={{
-      settings, setSettings, events, players, currentLevelIndex, showCurrency, setShowCurrency, stats, timeLeft, displayLevelNumber,
-      isTimerRunning: timerState.startedAt && !timerState.pausedAt,
-      addPlayer, playerRebuy, playerOut, playerAddon, calculateNextRebuy, undoLastEvent, resetGame,
-      toggleTimer, handleNextLevel, handlePrevLevel, addTimeToCurrentRound
-    }}>
+    <GameContext.Provider
+      value={{
+        settings,
+        setSettings,
+        events,
+        players,
+        currentLevelIndex,
+        showCurrency,
+        setShowCurrency,
+        stats,
+        timeLeft,
+        displayLevelNumber,
+        isTimerRunning: timerState.startedAt && !timerState.pausedAt,
+        addPlayer,
+        playerRebuy,
+        playerOut,
+        playerAddon,
+        calculateNextRebuy,
+        undoLastEvent,
+        resetGame,
+        toggleTimer,
+        handleNextLevel,
+        handlePrevLevel,
+        addTimeToCurrentRound,
+      }}
+    >
       {children}
     </GameContext.Provider>
   );
